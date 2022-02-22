@@ -19,9 +19,11 @@
     <div id="cesiumcontainer" style="height: 100%;"></div>
     <script>
         
+        var longitude, latitude, altitude;
+        
         function Location() {};
- 
-        Location.prototype.getLocation = function (callback) {
+        
+        Location.prototype.m_getLocation = function (callback) {
             var options = {
                 enableHighAccuracy: true,
                 maximumAge: 1000
@@ -31,7 +33,9 @@
                     alert(address.province + address.city);
                     console.log("getocation(callbackFunction) 可获得定位信息对象");
                 };
+            
             var self = this;
+            this.gotlocation = 0;
             if (navigator.geolocation) {
                 //浏览器支持geolocation
                 navigator.geolocation.getCurrentPosition(function (position) {
@@ -42,9 +46,11 @@
                     //海拔
                     var altitude = position.coords.altitude;
 
-                    self.callback([longitude,latitude,altitude])
+                    this.callback([longitude,latitude,altitude]);
                     //self.loadMapApi(longitude, latitude);
-                }, self.onError, options);
+                    
+                    this.gotlocation = 1;
+                }, this.onError, options);
             } else {
                 //浏览器不支持geolocation
             }
@@ -86,15 +92,15 @@
 
         //调用
         var local = new Location();
-        local.getLocation(function (res) {
+        local.m_getLocation(function (res) {
             //此处就是返回的地理位置信息
-            console.log(res);
+            window.longitude, window.latitude, window.altitude = res;
             //把返回的对象转为字符串了，自己根据需求截取下就好
             //var resstr = JSON.stringify(res);
             //alert(resstr);
         });
 
-
+        alert([longitude,latitude,altitude]);
 
         Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YzIzZjFkYi01YzU2LTQ1YmEtYWIzOC00MzVhNjAzY2E2MDEiLCJpZCI6ODMyMDEsImlhdCI6MTY0NTQzMDEzMX0.g62phdhvaMrDUyvw-qVayetbr39pVAqS5Ka1ipdSR04'
 
@@ -140,16 +146,17 @@
         //         // 定位完成之后的回调函数
         //     }
         // });
-
-        viewer.camera.flyTo({
-            destination: {x: -1165465.631099014, y: 5086030.678604161, z: 3666641.4198568375},
-            orientation: {
-                heading : 0.22348625575525194,
-                pitch : -0.4301601970612787,
-                roll : Cesium.Math.toRadians(0)
-            }
-        });
-         
+        if (local.gotlocation) {
+            viewer.camera.flyTo({
+                destination: Cesium.Cartesian3.fromDegrees(longitude,latitude,altitude)
+                orientation: {
+                    heading : 0.22348625575525194,
+                    pitch : -0.4301601970612787,
+                    roll : Cesium.Math.toRadians(0)
+                }
+            });
+        }
+        
     </script>
 </body>
 </html>
