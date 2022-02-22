@@ -94,6 +94,7 @@
         var local = new Location();
         local.m_getLocation(function (res) {
             //此处就是返回的地理位置信息
+            
             window.longitude = res[0];
             window.latitude = res[1];
             window.altitude = res[2];
