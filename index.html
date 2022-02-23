@@ -35,7 +35,7 @@
                 };
             
             var self = this;
-            this.gotlocation = 0;
+            self.gotlocation = 0;
             if (navigator.geolocation) {
                 //浏览器支持geolocation
                 navigator.geolocation.getCurrentPosition(function (position) {
@@ -44,12 +44,12 @@
                     //纬度
                     var latitude = position.coords.latitude;
                     //海拔
-                    var altitude = position.coords.altitude;
+                    var altitude = position.coords.altitude!=null?position.coords.altitude+100:1000;
                     alert(altitude);
+                    self.gotlocation = 1;
+
                     self.callback([longitude,latitude,altitude]);
                     //self.loadMapApi(longitude, latitude);
-                    
-                    self.gotlocation = 1;
                 }, self.onError, options);
             } else {
                 //浏览器不支持geolocation
@@ -150,9 +150,9 @@
         // });
         alert(local.gotlocation);
         if (local.gotlocation) {
-            alert("即将跳转到当前位置");
+            alert("跳转到当前位置");
             viewer.camera.flyTo({
-                destination: Cesium.Cartesian3.fromDegrees(longitude,latitude,1000),
+                destination: Cesium.Cartesian3.fromDegrees(longitude,latitude,altitude),
                 orientation: {
                     heading : 0.22348625575525194,
                     pitch : -0.4301601970612787,
