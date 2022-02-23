@@ -45,7 +45,7 @@
                     var latitude = position.coords.latitude;
                     //海拔
                     var altitude = position.coords.altitude;
-                    alert([longitude,latitude,altitude]);
+                    alert(altitude);
                     self.callback([longitude,latitude,altitude]);
                     //self.loadMapApi(longitude, latitude);
                     
@@ -131,7 +131,6 @@
             scene3DOnly: false, //每个几何实例将只能以3D渲染以节省GPU内存
             sceneMode: 3, //初始场景模式 1 2D模式 2 2D循环模式 3 3D模式  Cesium.SceneMode
             fullscreenElement: document.body, //全屏时渲染的HTML元素 暂时没发现用处
-            //天地图是官方开元的地图，不需要密钥
 
             imageryProvider: image,
             terrainProvider: terrain
