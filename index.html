@@ -45,12 +45,12 @@
                     var latitude = position.coords.latitude;
                     //海拔
                     var altitude = position.coords.altitude;
-
-                    this.callback([longitude,latitude,altitude]);
+                    alert([longitude,latitude,altitude]);
+                    self.callback([longitude,latitude,altitude]);
                     //self.loadMapApi(longitude, latitude);
                     
-                    this.gotlocation = 1;
-                }, this.onError, options);
+                    self.gotlocation = 1;
+                }, self.onError, options);
             } else {
                 //浏览器不支持geolocation
             }
