@@ -19,13 +19,7 @@
     <div id="cesiumcontainer" style="height: 100%;"></div>
     <script>
         
-        var sleep = function(time) {
-            var startTime = new Date().getTime() + parseInt(time, 10);
-            while(new Date().getTime() < startTime) {}
-        };  
-
         var longitude, latitude, altitude;
-        var gotlocation = 0;
 
         function Location() {};
         
@@ -41,7 +35,7 @@
                 };
             
             var self = this;
-            
+            self.gotlocation = 0;
             if (navigator.geolocation) {
                 //浏览器支持geolocation
                 navigator.geolocation.getCurrentPosition(function (position) {
@@ -52,6 +46,7 @@
                     //海拔
                     var altitude = position.coords.altitude!=null?position.coords.altitude+100:1000;
                     alert(altitude);
+                    self.gotlocation = 1;
 
                     self.callback([longitude,latitude,altitude]);
                     //self.loadMapApi(longitude, latitude);
@@ -94,6 +89,24 @@
                 break;
             }
         };
+
+        //调用
+        var local = new Location();
+        local.m_getLocation(function (res) {
+            //此处就是返回的地理位置信息
+            alert(res);
+            window.longitude = res[0];
+            window.latitude = res[1];
+            window.altitude = res[2];
+            //把返回的对象转为字符串了，自己根据需求截取下就好
+            //var resstr = JSON.stringify(res);
+            //alert(resstr);
+        });
+
+        </script>
+        <script>
+
+        //alert([longitude,latitude,altitude]);
 
         Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YzIzZjFkYi01YzU2LTQ1YmEtYWIzOC00MzVhNjAzY2E2MDEiLCJpZCI6ODMyMDEsImlhdCI6MTY0NTQzMDEzMX0.g62phdhvaMrDUyvw-qVayetbr39pVAqS5Ka1ipdSR04'
 
@@ -138,22 +151,6 @@
         //         // 定位完成之后的回调函数
         //     }
         // });
-
-        //调用
-        var local = new Location();
-        local.m_getLocation(function (res) {
-            //此处就是返回的地理位置信息
-            alert(res);
-            window.longitude = res[0];
-            window.latitude = res[1];
-            window.altitude = res[2];
-            //把返回的对象转为字符串了，自己根据需求截取下就好
-            //var resstr = JSON.stringify(res);
-            //alert(resstr);
-            window.gotlocation = 1;
-        });
-
-
         alert(local.gotlocation);
         if (local.gotlocation) {
             alert("即将跳转到当前位置");
