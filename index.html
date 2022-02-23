@@ -149,8 +149,9 @@
         //     }
         // });
         if (local.gotlocation) {
+            alert("即将跳转到当前位置");
             viewer.camera.flyTo({
-                destination: Cesium.Cartesian3.fromDegrees(longitude,latitude,altitude),
+                destination: Cesium.Cartesian3.fromDegrees(longitude,latitude,1000),
                 orientation: {
                     heading : 0.22348625575525194,
                     pitch : -0.4301601970612787,
