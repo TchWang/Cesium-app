@@ -48,9 +48,6 @@
                     
                     self.gotlocation = 1;
                     
-                    alert("get");
-                    
-
                     self.callback([longitude,latitude,altitude]);
                     //self.loadMapApi(longitude, latitude);
                 }, self.onError, options);
@@ -95,17 +92,6 @@
 
         //调用
         var local = new Location();
-        local.m_getLocation(function (res) {
-            //此处就是返回的地理位置信息
-            alert(res);
-            window.longitude = res[0];
-            window.latitude = res[1];
-            window.altitude = res[2];
-            //把返回的对象转为字符串了，自己根据需求截取下就好
-            //var resstr = JSON.stringify(res);
-            //alert(resstr);
-        });
-        alert("get0:"+local.gotlocation);
         
     </script>
     <script>
@@ -155,19 +141,41 @@
         //         // 定位完成之后的回调函数
         //     }
         // });
-        alert("get1:"+local.gotlocation);
-        if (local.gotlocation) {
-            alert("即将跳转到当前位置");
-            viewer.camera.flyTo({
-                destination: Cesium.Cartesian3.fromDegrees(longitude,latitude,altitude),
-                orientation: {
-                    heading : 0.22348625575525194,
-                    pitch : -0.4301601970612787,
-                    roll : Cesium.Math.toRadians(0)
-                }
+
+    </script>
+    <script>
+
+        while (1){
+
+            local.m_getLocation(function (res) {
+                //此处就是返回的地理位置信息
+                //alert(res);
+                window.longitude = res[0];
+                window.latitude = res[1];
+                window.altitude = res[2];
+                //把返回的对象转为字符串了，自己根据需求截取下就好
+                //var resstr = JSON.stringify(res);
+                //alert(resstr);
             });
+            
+            setTimeout(function (){
+
+                if (local.gotlocation) {
+                    alert("即将跳转到当前位置");
+                    viewer.camera.flyTo({
+                        destination: Cesium.Cartesian3.fromDegrees(longitude,latitude,altitude),
+                        orientation: {
+                            heading : 0,
+                            pitch : -0.4,
+                            roll : Cesium.Math.toRadians(0)
+                        }
+                    });
+                    local.gotlocation = 0;
+                }
+
+            }, 1000);
         }
-        alert("get2:"+local.gotlocation);
+      
     </script>
 </body>
 </html>
