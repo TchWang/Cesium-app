@@ -22,6 +22,9 @@
         // 定位功能初始化
         
         var longitude, latitude, altitude;
+        longitude=116.3;
+        latitude=39.9;
+        altitude=200;
 
         function Location() {};
         
@@ -46,7 +49,7 @@
                     //纬度
                     var latitude = position.coords.latitude;
                     //海拔
-                    var altitude = position.coords.altitude!=null?position.coords.altitude+100:1000;
+                    var altitude = position.coords.altitude!=null?position.coords.altitude:200;
                     
                     self.gotlocation = 1;
                     
@@ -131,18 +134,18 @@
             terrainProvider: terrain
         });
 
-        // viewer.camera.flyTo({
-        //     destination: Cesium.Cartesian3.fromDegrees(103.84, 31.15, 17850000),
-        //     orientation: {
-        //         heading : Cesium.Math.toRadians(348.4202942851978),
-        //         pitch : Cesium.Math.toRadians(-89.74026687972041),
-        //         roll : Cesium.Math.toRadians(0)
-        //     },
-        //     complete:function callback() {
+        viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(103.84, 31.15, 17850000),
+            orientation: {
+                heading : Cesium.Math.toRadians(348.4202942851978),
+                pitch : Cesium.Math.toRadians(-89.74026687972041),
+                roll : Cesium.Math.toRadians(0)
+            },
+            complete:function callback() {
                 
-        //         // 定位完成之后的回调函数
-        //     }
-        // });
+                // 定位完成之后的回调函数
+            }
+        });
 
     </script>
     <script>
@@ -166,10 +169,10 @@
                 alert([longitude,latitude,altitude]);
                 alert("即将跳转到当前位置");
                 viewer.camera.flyTo({
-                    destination: Cesium.Cartesian3.fromDegrees(longitude,latitude,altitude),
+                    destination: Cesium.Cartesian3.fromDegrees(longitude,latitude,altitude+800),
                     orientation: {
                         heading : 0,
-                        pitch : Cesium.Math.toRadians(-90),
+                        pitch : -0.4,
                         roll : Cesium.Math.toRadians(0)
                     }
                 });
@@ -181,7 +184,7 @@
         }, 3000);
       
     </script>
-<!--     <script>
+    <script>
         
         // 标签
 
@@ -206,6 +209,6 @@
 
         viewer.zoomTo(viewer.entities);
 
-    </script> -->
+    </script>
 </body>
 </html>
