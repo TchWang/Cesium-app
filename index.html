@@ -189,7 +189,7 @@
         // 标签
 
         var CP = viewer.entities.add({
-            name : 'Current Position',
+            name : 'Current_Position',
             position : Cesium.Cartesian3.fromDegrees(longitude,latitude),
             point : {
                 pixelSize : 5,
@@ -206,6 +206,12 @@
                 pixelOffset : new Cesium.Cartesian2(0, -9)
             }
         });
+
+        setTimeout(function (){
+
+            viewer.zoomTo(viewer.entities);
+
+        }, 3000);
 
         viewer.zoomTo(viewer.entities);
 
