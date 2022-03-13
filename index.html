@@ -5,7 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>cesium-app</title>
-    <script src="./scripts/Cesium/Cesium.js"></script>
+    <script type="text/javascript" src="./scripts/Cesium/Cesium.js"></script>
+    <script type="text/javascript" src="./scripts/cesium-navigation-development/dist/standalone/viewerCesiumNavigationMixin.js"></script>
     <link rel="stylesheet" href="./scripts/Cesium/Widgets/widgets.css">
     <style>
         html, body {
@@ -13,17 +14,49 @@
             margin: 0px;
             padding: 0px;
         }
+
+        /* 罗盘定位 */
+        .compass {
+            position: absolute;
+            left: 2%;
+            top: 2%;
+        }
+
+        /* 比例尺位置 */
+        .distance-legend {
+            position: absolute;
+            left: 2%;
+            bottom: 6%;
+        }
+
+        /* 缩放位置 */
+        .navigation-controls {
+            position: absolute;
+            bottom: 10%;
+            right: 2%;
+        } 
     </style>
 </head>
 <body>
     <div id="cesiumcontainer" style="height: 100%;"></div>
+    <div id="latlng_show" style=height:5%;position:absolute;bottom:10%;right:5%;z-index:1;font-size:1%;">  
+        <div style="width:100px;height:30px;float:left;">  
+             <font size="3" color="white">经度：<span id="longitude_show"></span></font>  
+        </div>  
+        <div style="width:100px;height:30px;float:left;">  
+             <font size="3" color="white">纬度：<span id="latitude_show"></span></font>  
+        </div>  
+        <div style="width:140px;height:30px;float:left;">  
+             <font size="3" color="white">视高：<span id="altitude_show"></span>km</font>  
+        </div>  
+    </div>
     <script>
         
         // 定位功能初始化
         
         var longitude, latitude, altitude;
-        longitude=116.3;
-        latitude=39.9;
+        longitude=116.0;
+        latitude=40.0;
         altitude=200;
 
         function Location() {};
@@ -134,7 +167,16 @@
             terrainProvider: terrain
         });
 
-        viewer.camera.flyTo({
+        var options = {};
+        options.defaultResetView = Cesium.Rectangle.fromDegrees(71, 3, 90, 14);
+        // Only the compass will show on the map
+        options.enableCompass = true;
+        options.enableZoomControls = false;
+        options.enableDistanceLegend = true;
+        options.enableCompassOuterRing= false;
+        viewer.extend(Cesium.viewerCesiumNavigationMixin, options);
+
+        viewer.camera.setView({
             destination: Cesium.Cartesian3.fromDegrees(103.84, 31.15, 17850000),
             orientation: {
                 heading : Cesium.Math.toRadians(348.4202942851978),
@@ -146,6 +188,29 @@
                 // 定位完成之后的回调函数
             }
         });
+
+        var longitude_show=document.getElementById('longitude_show');  
+        var latitude_show=document.getElementById('latitude_show');  
+        var altitude_show=document.getElementById('altitude_show');  
+        var canvas=viewer.scene.canvas;  
+        //具体事件的实现  
+        var ellipsoid=viewer.scene.globe.ellipsoid;  
+        var handler = new Cesium.ScreenSpaceEventHandler(canvas);  
+        handler.setInputAction(function(movement){  
+            //捕获椭球体，将笛卡尔二维平面坐标转为椭球体的笛卡尔三维坐标，返回球体表面的点  
+            var cartesian=viewer.camera.pickEllipsoid(movement.endPosition, ellipsoid);  
+            if(cartesian){  
+                //将笛卡尔三维坐标转为地图坐标（弧度）  
+                var cartographic=viewer.scene.globe.ellipsoid.cartesianToCartographic(cartesian);  
+                //将地图坐标（弧度）转为十进制的度数  
+                var lat_String=Cesium.Math.toDegrees(cartographic.latitude).toFixed(4);  
+                var log_String=Cesium.Math.toDegrees(cartographic.longitude).toFixed(4);  
+                var alti_String=(viewer.camera.positionCartographic.height/1000).toFixed(2);  
+                longitude_show.innerHTML=log_String;  
+                latitude_show.innerHTML=lat_String;  
+                altitude_show.innerHTML=alti_String;  
+            }  
+        },Cesium.ScreenSpaceEventType.MOUSE_MOVE); 
 
     </script>
     <script>
@@ -164,55 +229,62 @@
         });
 
         setTimeout(function (){
-
-            if (local.gotlocation) {
-                alert([longitude,latitude,altitude]);
-                alert("即将跳转到当前位置");
-                viewer.camera.flyTo({
-                    destination: Cesium.Cartesian3.fromDegrees(longitude,latitude,altitude+800),
-                    orientation: {
-                        heading : 0,
-                        pitch : -0.4,
-                        roll : Cesium.Math.toRadians(0)
-                    }
-                });
-                local.gotlocation = 0;
-            }else{
-                alert("还未获取到");
-            }
-
-        }, 3000);
-      
-    </script>
-    <script>
-        
-        // 标签
-
-        setTimeout(function (){
+            
+            // 标签
 
             var CP = viewer.entities.add({
-                name : 'Current_Position',
+                name : 'CP',
                 position : Cesium.Cartesian3.fromDegrees(longitude,latitude),
                 point : {
                     pixelSize : 5,
-                    color : Cesium.Color.RED,
-                    outlineColor : Cesium.Color.WHITE,
+                    color : Cesium.Color.WHITE,
+                    outlineColor : Cesium.Color.YELLOW,
                     outlineWidth : 2
                 },
                 label : {
                     text : 'Current Position',
                     font : '14pt monospace',
                     style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                    color : Cesium.Color.WHITE,
+                    outlineColor : Cesium.Color.YELLOW,
                     outlineWidth : 2,
                     verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
                     pixelOffset : new Cesium.Cartesian2(0, -9)
                 }
             });
 
-            viewer.zoomTo(viewer.entities);
+            var XY = viewer.entities.add({
+                name : 'XY',
+                rectangle : {
+                    coordinates : Cesium.Rectangle.fromDegrees(longitude-0.1175, latitude-0.09, longitude+0.1175, latitude+0.09),
+                    material : new Cesium.GridMaterialProperty({
+                        color : Cesium.Color.RED,
+                        cellAlpha : 0,
+                        lineCount : new Cesium.Cartesian2(200, 200),
+                        lineThickness : new Cesium.Cartesian2(1.2, 1.2)
+                    })
+                }
+            });
+
+            if (local.gotlocation != 1) {
+                //alert([longitude,latitude,altitude]);
+                alert("还未获取到位置数据，使用默认位置");
+            }
+
+            alert("即将跳转到当前位置："+[longitude,latitude,altitude]);
+            viewer.camera.flyTo({
+                destination: Cesium.Cartesian3.fromDegrees(longitude,latitude-0.032,1500),
+                orientation: {
+                    heading : 0,
+                    pitch : Cesium.Math.toRadians(-25),
+                    roll : Cesium.Math.toRadians(0)
+                }
+            });
+            local.gotlocation = 0;
 
         }, 3000);
-
+      
     </script>
+
 </body>
 </html>
