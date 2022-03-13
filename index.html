@@ -280,9 +280,10 @@
 
             }else{
 
-                //alert([longitude,latitude,altitude]);
+                //alert("即将跳转到当前位置："+[longitude,latitude,altitude]);
                 setInterval(function(){
 
+                    alert("即将跳转到当前位置："+[longitude,latitude,altitude]);
                     viewer.camera.flyTo({
                         destination: Cesium.Cartesian3.fromDegrees(longitude,latitude-0.032,1500),
                         orientation: {
