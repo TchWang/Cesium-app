@@ -266,21 +266,48 @@
                 }
             });
 
-            if (local.gotlocation != 1) {
-                //alert([longitude,latitude,altitude]);
-                alert("还未获取到位置数据，使用默认位置");
-            }
+            if (local.gotlocation == 0) {
 
-            alert("即将跳转到当前位置："+[longitude,latitude,altitude]);
-            viewer.camera.flyTo({
-                destination: Cesium.Cartesian3.fromDegrees(longitude,latitude-0.032,1500),
-                orientation: {
-                    heading : 0,
-                    pitch : Cesium.Math.toRadians(-25),
-                    roll : Cesium.Math.toRadians(0)
-                }
-            });
-            local.gotlocation = 0;
+                alert("未获取到位置数据，使用默认位置");
+                viewer.camera.flyTo({
+                    destination: Cesium.Cartesian3.fromDegrees(longitude,latitude-0.032,1500),
+                    orientation: {
+                        heading : 0,
+                        pitch : Cesium.Math.toRadians(-25),
+                        roll : Cesium.Math.toRadians(0)
+                    }
+                });
+
+            }else{
+
+                //alert([longitude,latitude,altitude]);
+                setInterval(function(){
+
+                    viewer.camera.flyTo({
+                        destination: Cesium.Cartesian3.fromDegrees(longitude,latitude-0.032,1500),
+                        orientation: {
+                            heading : 0,
+                            pitch : Cesium.Math.toRadians(-25),
+                            roll : Cesium.Math.toRadians(0)
+                        }
+                    });
+
+                    local.m_getLocation(function (res) {
+                        //此处就是返回的地理位置信息
+                        //alert(res);
+                        longitude = res[0];
+                        latitude = res[1];
+                        altitude = res[2];
+                        //把返回的对象转为字符串了，自己根据需求截取下就好
+                        //var resstr = JSON.stringify(res);
+                        //alert(resstr);
+                    });
+
+                    CP.position = Cesium.Cartesian3.fromDegrees(longitude,latitude);
+
+                },1000);
+
+            }
 
         }, 3000);
       
